@@ -44,3 +44,22 @@ const convertTOAmount = (amount: string): string => {
   }
   return '0.00';
 }
+
+export async function getBalanceNative(address: string): Promise<string> {
+  const addressWithout0x = address.slice(2);
+  const response = await axios.post('https://testnet-rpc.monad.xyz/', {
+    "jsonrpc": "2.0",
+    "method": "eth_getBalance",
+    "params": [
+      address,
+      "latest"
+    ],
+    "id": 0
+  }
+  )
+  if (response.status != 200) {
+    return '0.00';
+  }
+  const ammount =response.data.result ?  await convertTOAmount(response.data.result) : '0.00';
+  return ammount;
+}

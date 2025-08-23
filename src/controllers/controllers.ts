@@ -3,7 +3,7 @@ import logger from '../common/utils/logger';
 import { request, Request, Response } from 'express';
 import User, { IUser } from '../models/userModel';
 import { generateToken } from '../common/utils/auth_jwt';
-import { createWalletETH, getBalance } from '../common/utils/external_service';
+import { createWalletETH, getBalance, getBalanceNative } from '../common/utils/external_service';
 
 export const createUser = async (req: Request, res: Response) => {
   try {
@@ -75,9 +75,10 @@ export const getUser = async (req: Request, res: Response) => {
     }
     const data = response.toJSON()
     const balance = await getBalance(response.walletAddress.address);
+    const balanceNative = await getBalanceNative(response.walletAddress.address);
     return res.status(200).json({
       message: messages.success,
-      data: { 'user': data, 'balance': balance }
+      data: { 'user': data, 'balance': balance,'balanceNative': balanceNative }
     });
   } catch (error: any) {
     console.log(error);
