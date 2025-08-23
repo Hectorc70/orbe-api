@@ -3,7 +3,7 @@ import logger from '../common/utils/logger';
 import { request, Request, Response } from 'express';
 import User, { IUser } from '../models/userModel';
 import { generateToken } from '../common/utils/auth_jwt';
-import { createWalletETH } from '../common/utils/external_service';
+import { createWalletETH, getBalance } from '../common/utils/external_service';
 
 export const createUser = async (req: Request, res: Response) => {
   try {
@@ -57,7 +57,7 @@ export const loginUser = async (req: Request, res: Response) => {
 };
 export const getUser = async (req: Request, res: Response) => {
   try {
-    const {id} = req.params 
+    const { id } = req.params
     const response = await User.findOne({ _id: id });
     if (!response) {
       return res.status(404).json({
@@ -65,9 +65,11 @@ export const getUser = async (req: Request, res: Response) => {
         data: {}
       });
     }
+    const data = response.toJSON()
+    const balance = await getBalance(response.walletAddress.address);
     return res.status(200).json({
       message: messages.success,
-      data:response.toJSON()
+      data: { 'user': data, 'balance': balance }
     });
   } catch (error: any) {
     console.log(error);
@@ -80,7 +82,7 @@ export const getUser = async (req: Request, res: Response) => {
 
 export const sendAmount = async (req: Request, res: Response) => {
   try {
-    const {id} = req.params 
+    const { id } = req.params
     const response = await User.findOne({ _id: id });
     if (!response) {
       return res.status(404).json({
@@ -90,7 +92,7 @@ export const sendAmount = async (req: Request, res: Response) => {
     }
     return res.status(200).json({
       message: messages.success,
-      data:response.toJSON()
+      data: response.toJSON()
     });
   } catch (error: any) {
     console.log(error);
