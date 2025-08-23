@@ -65,7 +65,29 @@ export const getUser = async (req: Request, res: Response) => {
         data: {}
       });
     }
-    
+    return res.status(200).json({
+      message: messages.success,
+      data:response.toJSON()
+    });
+  } catch (error: any) {
+    console.log(error);
+    return res.status(400).json({
+      message: error.toString(),
+      data: {}
+    });
+  }
+};
+
+export const sendAmount = async (req: Request, res: Response) => {
+  try {
+    const {id} = req.params 
+    const response = await User.findOne({ _id: id });
+    if (!response) {
+      return res.status(404).json({
+        message: messages.userNotFound,
+        data: {}
+      });
+    }
     return res.status(200).json({
       message: messages.success,
       data:response.toJSON()
