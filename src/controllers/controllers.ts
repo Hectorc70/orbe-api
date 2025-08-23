@@ -31,13 +31,21 @@ export const createUser = async (req: Request, res: Response) => {
 
 export const loginUser = async (req: Request, res: Response) => {
   try {
-    const response = await User.findOne({ email: req.body.email, password: req.body.password });
+    const { email, password } = req.body
+    const response = await User.findOne({ email: email});
     if (!response) {
       return res.status(404).json({
         message: messages.userNotFound,
         data: {}
       });
     }
+    if (response.password !== password) {
+      return res.status(400).json({
+        message: messages.passwordInvalid,
+        data: {}
+      });
+    }
+
     const token = generateToken({ id: response._id, email: response.email });
     return res.status(200).json({
       message: messages.success,

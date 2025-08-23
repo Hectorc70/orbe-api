@@ -2,6 +2,7 @@ const messages = {
   success:'ok',
   error:'error',
   notFound:'not found',
+  passwordInvalid:'Password wrong',
   userNotFound:'Usuario no encontrado',
   datNotEmpy:'Proporciona datos para actualizar',
   codeInvalid:'Codigo invalido',
