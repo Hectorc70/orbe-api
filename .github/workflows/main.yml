@@ -1,0 +1,45 @@
+name: deployment
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: SETUP SSH 💻
+        run: |
+          mkdir -p ~/.ssh/
+          echo "${{ secrets.SSH_PRIV_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PUB_KEY }}" > ~/.ssh/id_rsa.pub
+          chmod 600 ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa.pub
+          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+          
+      - name: Deploy changes via SSH
+        id: deploy
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} << 'EOF'
+            cd /home/projects/orbe-api || exit 1
+            git pull https://${{ secrets.KEY_USER_GIT }}:${{ secrets.KEY_USER_GIT }}@github.com/Hectorc70/orbe-api.git master
+            npx tsc;pm2 restart orbe-api;pm2 status orbe-api
+            
+          EOF
+      
+      - name: Notify Success
+        if: steps.deploy.outcome == 'success'
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+          -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+          -d text="✅ ORBE API || Despliegue exitoso en Production 🚀%0ARepo: ${{ github.repository }}%0ABranch: ${{ github.ref_name }}"
+      
+      - name: Notify Failure
+        if: steps.deploy.outcome != 'success'
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="❌ *ORBE API* || Falló el despliegue en servidor 🚨 %0A Repo: ${{ github.repository }} %0A Branch: ${{ github.ref_name }}"
