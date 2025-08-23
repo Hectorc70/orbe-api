@@ -24,7 +24,7 @@ jobs:
         id: deploy
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} << 'EOF'
-            cd /home/projects/orbe-api || exit 1
+            cd /srv/orbe-api || exit 1
             git pull https://${{ secrets.KEY_USER_GIT }}:${{ secrets.KEY_USER_GIT }}@github.com/Hectorc70/orbe-api.git master
             npx tsc;pm2 restart orbe-api;pm2 status orbe-api
             
