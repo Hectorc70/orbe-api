@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/Users/hecgdev/Documents/FREELANCE/ORBE/orbe-api/src/logs/.8a6eeb07405439967c75962e6601ab46333b6b8c-audit.json",
+    "files": [
+        {
+            "date": 1755962165491,
+            "name": "/Users/hecgdev/Documents/FREELANCE/ORBE/orbe-api/src/logs/app-2025-08-23.log",
+            "hash": "ea5259b7b381dd25839b8b520f86bab91891ede0210a6884c4b4fc24d27a3047"
+        }
+    ],
+    "hashType": "sha256"
+}
