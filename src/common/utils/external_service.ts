@@ -34,9 +34,21 @@ export async function getBalance(address: string): Promise<string> {
   if (response.status != 200) {
     return '0.00';
   }
-  const ammount =response.data.result ?  await convertTOAmount(response.data.result) : '0.00';
-  return ammount;
+  let balance = '0.00';
+  try {
+    const usdcBalanceBigInt = BigInt(response.data.result);
+    const usdcDecimals = 6;
+    const usdcBalance = Number(usdcBalanceBigInt) / Math.pow(10, usdcDecimals);
+    balance = usdcBalance.toFixed(2);
+
+
+  } catch (error) {
+    logger.error(error);
+  }
+
+  return balance;
 }
+
 
 const convertTOAmount = (amount: string): string => {
   if (amount) {
@@ -60,6 +72,17 @@ export async function getBalanceNative(address: string): Promise<string> {
   if (response.status != 200) {
     return '0.00';
   }
-  const ammount =response.data.result ?  await convertTOAmount(response.data.result) : '0.00';
-  return ammount;
+  let balance = '0.00';
+  try {
+    const monBalanceBigInt = BigInt(response.data.result);
+    const monDecimals = 18;
+    const monBalanceFloat = Number(monBalanceBigInt) / Math.pow(10, monDecimals);
+    balance = monBalanceFloat.toFixed(2);
+
+
+  } catch (error) {
+    logger.error(error);
+  }
+
+  return balance;
 }
