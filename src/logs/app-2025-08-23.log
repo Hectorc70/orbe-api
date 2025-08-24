@@ -30,3 +30,14 @@
 [2025-08-23T23:37:35.978Z] INFO: 0x00000000000000000000000000000000000000000000000000000000004c4b40
 [2025-08-23T23:38:10.953Z] INFO: 0x00000000000000000000000000000000000000000000000000000000004c4b40
 [2025-08-23T23:39:00.160Z] INFO: 0x00000000000000000000000000000000000000000000000000000000004c4b40
+[2025-08-24T00:28:10.437Z] ERROR: invalid FixedNumber string value (argument="value", value="NaN", code=INVALID_ARGUMENT, version=6.15.0)
+[2025-08-24T00:28:28.213Z] ERROR: invalid FixedNumber string value (argument="value", value="NaN", code=INVALID_ARGUMENT, version=6.15.0)
+[2025-08-24T00:29:00.732Z] ERROR: invalid FixedNumber string value (argument="value", value="NaN", code=INVALID_ARGUMENT, version=6.15.0)
+[2025-08-24T00:29:23.526Z] ERROR: invalid FixedNumber string value (argument="value", value="NaN", code=INVALID_ARGUMENT, version=6.15.0)
+[2025-08-24T00:29:44.955Z] ERROR: invalid FixedNumber string value (argument="value", value="NaN", code=INVALID_ARGUMENT, version=6.15.0)
+[2025-08-24T00:29:49.980Z] ERROR: invalid FixedNumber string value (argument="value", value="NaN", code=INVALID_ARGUMENT, version=6.15.0)
+[2025-08-24T00:30:14.504Z] INFO: Transacción firmada:
+[2025-08-24T00:30:14.584Z] ERROR: could not coalesce error (error={ "code": -32603, "message": "maxFeePerGas too low to be include in upcoming blocks" }, payload={ "id": 4, "jsonrpc": "2.0", "method": "eth_sendRawTransaction", "params": [ "0x01f8ae82279f808502540be400830186a094f817257fed379853cde0fa4f97ab987181b1e5ea80b844a9059cbb0000000000000000000000008b8e3357db158658a0760f35f4a40222057e18380000000000000000000000000000000000000000000000000000000000002710c080a043af866436578177600dc8b9dc800c31728202f3d165c4977eab9feef16df3d7a03607ff5b5bd476a750598492ae292a9081ba578687c35ee7c0956a07e81f195b" ] }, code=UNKNOWN_ERROR, version=6.15.0)
+[2025-08-24T00:34:46.933Z] INFO: Transacción firmada:
+[2025-08-24T00:34:52.283Z] INFO: Hash de transacción:
+[2025-08-24T00:34:52.284Z] INFO: Explorer: https://testnet.monadexplorer.com/tx/0x48c7829273db0a7871eef870036c4655f94cd7ea2d3055fff4102a189e2f7651

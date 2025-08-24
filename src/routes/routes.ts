@@ -7,7 +7,7 @@ const router = Router();
 router.post("/users/create/", createUser);
 router.post("/users/login/", loginUser);
 router.get("/users/get/:id",validateToken, getUser);
-router.get("/transactions/send/",validateToken, sendAmount);
+router.post("/transactions/send/",validateToken, sendAmount);
 
 
 
