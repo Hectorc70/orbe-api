@@ -10,6 +10,7 @@ const messages = {
   userExists:'Ya existen datos con este numero de telefono, intente con otro',
   registerNotFound:'Registro no encontrado',
   codeSms:'El codigo tiene una vigencia de 10 min. espera para poder enviar uno nuevo',
+  balanceInsofucient:'Tokens de monad insuficientes',
 }
 
 

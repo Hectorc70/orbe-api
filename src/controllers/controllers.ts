@@ -6,6 +6,7 @@ import { generateToken, getTokenFromHeaders, verifyToken } from '../common/utils
 import { createWalletETH, getBalance, getBalanceNative, sendUSDC, swapNativeToUSDC } from '../common/utils/external_service';
 import { parse } from 'path';
 import { Transaction } from '../models/transactionModel';
+import { universalResolverReverseAbi } from 'viem/_types/constants/abis';
 
 export const createUser = async (req: Request, res: Response) => {
   try {
@@ -114,6 +115,13 @@ export const sendAmount = async (req: Request, res: Response) => {
       if (!userFrom) {
         return res.status(404).json({
           message: messages.userNotFound,
+          data: {}
+        });
+      }
+      const balance = await getBalance(userFrom.walletAddress.address);
+      if (parseFloat(balance) < 0.1) {
+        return res.status(400).json({
+          message: messages.balanceInsofucient,
           data: {}
         });
       }
