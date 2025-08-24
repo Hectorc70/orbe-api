@@ -219,13 +219,34 @@ export async function swapNativeToUSDC(fromPrivateKey: string, amount: number): 
   // }
 
   // return data.transaction.hash
-
+  const nonce = await client.getTransactionCount({
+    address: client.account.address,
+  });
+  const signedTransaction = await client.signTransaction({
+    account: client.account,
+    chain: client.chain,
+    gas: !!data?.transaction.gas
+      ? BigInt(data?.transaction.gas)
+      : undefined,
+    to: data?.transaction.to,
+    data: data.transaction.data,
+    value: data?.transaction.value
+      ? BigInt(data.transaction.value)
+      : undefined, // value is used for native tokens
+    gasPrice: !!data?.transaction.gasPrice
+      ? BigInt(data?.transaction.gasPrice)
+      : undefined,
+    nonce: nonce,
+  });
+  // const hash = await client.sendRawTransaction({
+  //   to: dataToSend.transaction.to,
+  //   data: dataToSend,
+  //   value: dataToSend.transaction.value ? BigInt(data.transaction.value) : BigInt(0),
+  //   gas: dataToSend.transaction.gas ? BigInt(data.transaction.gas) : undefined,
+  //   gasPrice: data.transaction.gasPrice ? BigInt(data.transaction.gasPrice) : undefined,
+  // });
   const hash = await client.sendRawTransaction({
-    to: data.transaction.to,
-    data: dataToSend,
-    value: data.transaction.value ? BigInt(data.transaction.value) : BigInt(0),
-    gas: data.transaction.gas ? BigInt(data.transaction.gas) : undefined,
-    gasPrice: data.transaction.gasPrice ? BigInt(data.transaction.gasPrice) : undefined,
+    serializedTransaction: signedTransaction,
   });
 
   return hash;
