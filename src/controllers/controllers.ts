@@ -3,7 +3,7 @@ import logger from '../common/utils/logger';
 import { request, Request, Response } from 'express';
 import User, { IUser } from '../models/userModel';
 import { generateToken, getTokenFromHeaders, verifyToken } from '../common/utils/auth_jwt';
-import { createWalletETH, getBalance, getBalanceNative, sendUSDC } from '../common/utils/external_service';
+import { createWalletETH, getBalance, getBalanceNative, sendUSDC, swapNativeToUSDC } from '../common/utils/external_service';
 import { parse } from 'path';
 import { Transaction } from '../models/transactionModel';
 
@@ -95,7 +95,7 @@ export const sendAmount = async (req: Request, res: Response) => {
   try {
 
     const { send_to, typeSend, amount } = req.body
-
+    logger.info(`🎯 Nueva Transferencia send_to:${send_to} typeSend:${typeSend} amount:${amount}`);
     try {
       const token = getTokenFromHeaders(req) as string;
       const payload = verifyToken(token);
@@ -127,7 +127,46 @@ export const sendAmount = async (req: Request, res: Response) => {
         hash: resultTransfer
       }
       await Transaction.create(data);
-    } catch (error:any) {
+    } catch (error: any) {
+      logger.error(error);
+      return res.status(400).json({
+        message: messages.error,
+        data: { 'error': error.toString() }
+      });
+    }
+    return res.status(200).json({
+      message: messages.success,
+      data: {}
+    });
+  } catch (error: any) {
+    console.log(error);
+    return res.status(400).json({
+      message: error.toString(),
+      data: {}
+    });
+  }
+};
+
+
+export const swapAmount = async (req: Request, res: Response) => {
+  try {
+
+    const { amount } = req.body
+
+    try {
+      const token = getTokenFromHeaders(req) as string;
+      const payload = verifyToken(token);
+      const userFrom = await User.findOne({ _id: payload && payload.id });
+      if (!userFrom) {
+        return res.status(404).json({
+          message: messages.userNotFound,
+          data: {}
+        });
+      }
+
+
+      await swapNativeToUSDC(userFrom.walletAddress.privateKey, parseFloat(amount));
+    } catch (error: any) {
       logger.error(error);
       return res.status(400).json({
         message: messages.error,

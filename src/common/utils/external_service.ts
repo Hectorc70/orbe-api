@@ -1,10 +1,15 @@
 
 import { log } from 'console';
-import { ethers } from 'ethers';
+import { concat, ethers, Wallet } from 'ethers';
 import logger from './logger';
 import IResponseWallet from '../../models/responseWallet';
 import axios from 'axios';
+import qs from 'qs';
 
+import { createPublicClient, createWalletClient, http, erc20Abi, parseUnits, publicActions, Hex, numberToHex, size, concatHex, pad } from 'viem';
+import { privateKeyToAccount } from 'viem/accounts';
+import { monadTestnet } from 'viem/chains';
+const NATIVE_ALIAS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' as const;
 export async function createWalletETH(): Promise<IResponseWallet> {
   const wallet = ethers.Wallet.createRandom();
   logger.info('🎯 Nueva Wallet Creada:');
@@ -116,6 +121,114 @@ export async function sendUSDC(fromPrivateKey: string, toAddress: string, amount
   logger.info('Hash de transacción:', txResponse.hash);
   logger.info('Explorer: https://testnet.monadexplorer.com/tx/' + txResponse.hash);
   return txResponse.hash;
+}
+
+export async function swapNativeToUSDC(fromPrivateKey: string, amount: number): Promise<string> {
+
+  const client = createWalletClient({
+    account: privateKeyToAccount(fromPrivateKey as Hex),
+    chain: monadTestnet,
+    transport: http(process.env.ALCHEMY_HTTP_TRANSPORT_URL!), // e.g. https://base-mainnet.g.alchemy.com/v2/KEY
+  }).extend(publicActions);
+  // const taker = new Wallet(fromPrivateKey).address;
+
+  const headers = {
+    '0x-api-key': process.env.OX_API_KEY as string, // REQUERIDO
+    '0x-version': 'v2',
+  };
+  // const sellToken = '0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701';
+  const sellToken = NATIVE_ALIAS;
+  const buyToken = '0xfBC2D240A5eD44231AcA3A9e9066bc4b33f01149';
+  const decimals = 18;
+  const sellAmount = parseUnits(String(amount), decimals).toString();
+
+  const params = { sellToken, buyToken, sellAmount, taker: client.account.address, chainId: String(10143) };
+
+  const { data } = await axios.get(
+    `https://api.0x.org/swap/permit2/quote`,
+    { params, paramsSerializer: p => qs.stringify(p), headers }
+  );
+  const isNativeSell = sellToken.toLowerCase() === NATIVE_ALIAS.toLowerCase();
+
+  let signature: Hex | undefined;
+  let dataToSend: Hex = data.transaction.data;
+  if (!isNativeSell && data.permit2?.eip712) {
+    const e = data.permit2.eip712;
+    const signature = await client.signTypedData({
+      account: client.account,
+      domain: e.domain,
+      types: e.types,
+      message: e.message,
+      primaryType: e.primaryType,
+    });
+
+    const byteLen = (signature.length - 2) / 2;
+    const lenWord = pad(numberToHex(byteLen), { size: 32 });
+    dataToSend = concatHex([data.transaction.data, lenWord, signature]);
+  }
+  // if (data.permit2?.eip712) {
+  //   try {
+  //     const e = data.permit2.eip712;
+  //     signature = await client.signTypedData({
+  //       account: client.account,
+  //       domain: e.domain,
+  //       types: e.types,
+  //       message: e.message,
+  //       primaryType: e.primaryType,
+  //     });
+  //     console.log("Signed permit2 message from quote response");
+  //   } catch (error) {
+  //     console.error("Error signing permit2 coupon:", error);
+  //   }
+  //   if (signature && data?.transaction?.data) {
+  //     const signatureLengthInHex = numberToHex(size(signature), {
+  //       signed: false,
+  //       size: 32,
+  //     });
+  //     const transactionData = data.transaction.data as Hex;
+  //     const sigLengthHex = signatureLengthInHex as Hex;
+  //     const sig = signature as Hex;
+  //     data.transaction.data = concat([transactionData, sigLengthHex, sig]);
+  //   } else {
+  //     throw new Error("Failed to obtain signature or transaction data");
+  //   }
+  // }
+  // if (signature && data.transaction.data) {
+  //   const nonce = await client.getTransactionCount({
+  //     address: client.account.address,
+  //   });
+
+  //   // const signedTransaction = await client.signTransaction();
+  //   const hash = await client.sendTransaction({
+  //     account: client.account,
+  //     chain: client.chain,
+  //     gas: data?.transaction.gas ? BigInt(data.transaction.gas) : undefined,
+  //     to: data?.transaction.to,
+  //     data: data.transaction.data,
+  //     value: data?.transaction.value
+  //       ? BigInt(data.transaction.value)
+  //       : undefined, // value is used for native tokens
+  //     gasPrice: !!data?.transaction.gasPrice
+  //       ? BigInt(data?.transaction.gasPrice)
+  //       : undefined,
+  //     nonce: nonce,
+  //   });
+  //   // console.log("Transaction hash:", hash);
+  //   logger.info('Explorer: https://testnet.monadexplorer.com/tx/' + hash);
+  //   return hash
+  // }
+
+  // return data.transaction.hash
+
+  const hash = await client.sendRawTransaction({
+    to: data.transaction.to,
+    data: dataToSend,
+    value: data.transaction.value ? BigInt(data.transaction.value) : BigInt(0),
+    gas: data.transaction.gas ? BigInt(data.transaction.gas) : undefined,
+    gasPrice: data.transaction.gasPrice ? BigInt(data.transaction.gasPrice) : undefined,
+  });
+
+  return hash;
 }
 
 
