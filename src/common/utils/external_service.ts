@@ -166,59 +166,6 @@ export async function swapNativeToUSDC(fromPrivateKey: string, amount: number): 
     const lenWord = pad(numberToHex(byteLen), { size: 32 });
     dataToSend = concatHex([data.transaction.data, lenWord, signature]);
   }
-  // if (data.permit2?.eip712) {
-  //   try {
-  //     const e = data.permit2.eip712;
-  //     signature = await client.signTypedData({
-  //       account: client.account,
-  //       domain: e.domain,
-  //       types: e.types,
-  //       message: e.message,
-  //       primaryType: e.primaryType,
-  //     });
-  //     console.log("Signed permit2 message from quote response");
-  //   } catch (error) {
-  //     console.error("Error signing permit2 coupon:", error);
-  //   }
-  //   if (signature && data?.transaction?.data) {
-  //     const signatureLengthInHex = numberToHex(size(signature), {
-  //       signed: false,
-  //       size: 32,
-  //     });
-  //     const transactionData = data.transaction.data as Hex;
-  //     const sigLengthHex = signatureLengthInHex as Hex;
-  //     const sig = signature as Hex;
-  //     data.transaction.data = concat([transactionData, sigLengthHex, sig]);
-  //   } else {
-  //     throw new Error("Failed to obtain signature or transaction data");
-  //   }
-  // }
-  // if (signature && data.transaction.data) {
-  //   const nonce = await client.getTransactionCount({
-  //     address: client.account.address,
-  //   });
-
-  //   // const signedTransaction = await client.signTransaction();
-  //   const hash = await client.sendTransaction({
-  //     account: client.account,
-  //     chain: client.chain,
-  //     gas: data?.transaction.gas ? BigInt(data.transaction.gas) : undefined,
-  //     to: data?.transaction.to,
-  //     data: data.transaction.data,
-  //     value: data?.transaction.value
-  //       ? BigInt(data.transaction.value)
-  //       : undefined, // value is used for native tokens
-  //     gasPrice: !!data?.transaction.gasPrice
-  //       ? BigInt(data?.transaction.gasPrice)
-  //       : undefined,
-  //     nonce: nonce,
-  //   });
-  //   // console.log("Transaction hash:", hash);
-  //   logger.info('Explorer: https://testnet.monadexplorer.com/tx/' + hash);
-  //   return hash
-  // }
-
-  // return data.transaction.hash
   const nonce = await client.getTransactionCount({
     address: client.account.address,
   });
