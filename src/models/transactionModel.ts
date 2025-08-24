@@ -8,6 +8,7 @@ export default interface ITransaction {
   amount: number;
   status: number; // 0 = pending, 1 = success
   hash?: string
+  typeTransaction: number // 0 = send, 1 = receive,2 = swap
 }
 
 const transactionSchema = new Schema<ITransaction>({
@@ -38,6 +39,10 @@ const transactionSchema = new Schema<ITransaction>({
     type: String,
     required: false,
     unique: true
+  },
+  typeTransaction: {
+    type: Number,
+    default: 0
   }
 }, {
   timestamps: true,

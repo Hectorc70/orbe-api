@@ -137,8 +137,8 @@ export async function swapNativeToUSDC(fromPrivateKey: string, amount: number): 
     '0x-version': 'v2',
   };
   // const sellToken = '0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701';
-  const sellToken = NATIVE_ALIAS;
-  const buyToken = '0xfBC2D240A5eD44231AcA3A9e9066bc4b33f01149';
+  const sellToken = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+  const buyToken = '0xf817257fed379853cDe0fa4F97AB987181B1E5Ea';
   const decimals = 18;
   const sellAmount = parseUnits(String(amount), decimals).toString();
 
@@ -148,7 +148,7 @@ export async function swapNativeToUSDC(fromPrivateKey: string, amount: number): 
     `https://api.0x.org/swap/permit2/quote`,
     { params, paramsSerializer: p => qs.stringify(p), headers }
   );
-  const isNativeSell = sellToken.toLowerCase() === NATIVE_ALIAS.toLowerCase();
+  const isNativeSell = true;
 
   let signature: Hex | undefined;
   let dataToSend: Hex = data.transaction.data;
@@ -248,7 +248,7 @@ export async function swapNativeToUSDC(fromPrivateKey: string, amount: number): 
   const hash = await client.sendRawTransaction({
     serializedTransaction: signedTransaction,
   });
-
+  logger.info('Explorer: https://testnet.monadexplorer.com/tx/' + hash);
   return hash;
 }
 

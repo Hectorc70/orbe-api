@@ -173,7 +173,17 @@ export const swapAmount = async (req: Request, res: Response) => {
       }
 
 
-      await swapNativeToUSDC(userFrom.walletAddress.privateKey, parseFloat(amount));
+      const hash = await swapNativeToUSDC(userFrom.walletAddress.privateKey, parseFloat(amount));
+      const data = {
+        typeSend: 1,
+        from: userFrom._id.toString(),
+        to: userFrom._id.toString(),
+        amount: parseFloat(amount),
+        status: 1,
+        hash: hash,
+        typeTransaction: 2
+      }
+      await Transaction.create(data);
     } catch (error: any) {
       logger.error(error);
       return res.status(400).json({
